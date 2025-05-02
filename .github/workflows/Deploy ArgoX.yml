@@ -166,3 +166,28 @@ jobs:
 
       - name: 启动SSH终端
         uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 2
+
+      - name: 发送提示
+        run: |
+          # 获取当前时间（UTC+8 时区，北京时间）
+          current_time=$(date -u +"%Y-%m-%d %H:%M:%S" -d "8 hour")
+
+          # 读取节点信息
+          node_info=$(cat new_node.txt)
+
+          # 构造 Telegram 消息
+          message=$(cat <<EOF
+          📌 <b>节点已关闭</b>  
+          EOF
+          )
+
+          # 进行 URL 编码
+          message=$(echo "$message" | jq -sRr @uri)
+
+          # 发送 Telegram 消息
+          curl -X POST "https://api.telegram.org/bot${{ secrets.TELEGRAM_TOKEN }}/sendMessage" \
+               -d "chat_id=${{ secrets.TELEGRAM_TO }}" \
+               -d "parse_mode=HTML" \
+               -d "text=$message"  >> /dev/null
+          echo "Telegram 消息发送成功"
