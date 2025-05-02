@@ -46,6 +46,7 @@ jobs:
           cat > gen.py << 'EOF'
           import requests
           import argparse
+          import json
 
           # 解析命令行参数
           parser = argparse.ArgumentParser(description="生成临时邮箱")
@@ -76,9 +77,10 @@ jobs:
             # 检查请求是否成功 (状态码 2xx)
             response.raise_for_status() # 如果状态码不是 2xx，会抛出 HTTPError 异常
 
-            # 直接输出响应内容
+            # 格式化并输出 JSON 响应
+            json_response = response.json()
             print("响应内容:")
-            print(response.text)
+            print(json.dumps(json_response, indent=2, ensure_ascii=False))
 
           except requests.exceptions.RequestException as e:
             print(f"请求失败: {e}")
