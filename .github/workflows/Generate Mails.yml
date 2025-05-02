@@ -5,12 +5,10 @@ on:
     inputs:
       pre:
         description: '邮箱前缀'
-        required: true
-        default: 'GH'
+        required: false
       num:
         description: '邮箱数量'
-        required: true
-        default: '5'
+        required: false
 
 jobs:
   Server:
@@ -105,7 +103,7 @@ jobs:
 
           EOF
 
-          python gen.py -p ${{ github.event.inputs.pre }} -c ${{ github.event.inputs.num }}>> email.txt
+          python gen.py -p ${{ github.event.inputs.pre }} -c ${{ github.event.inputs.num }} >> email.txt
           echo 生成成功
 
       - name: 发送通知
