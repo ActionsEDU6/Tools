@@ -1,12 +1,16 @@
-name: Generate Codes
+name: Generate Mails
 
 on:
   workflow_dispatch:
     inputs:
+      pre:
+        description: '邮箱前缀'
+        required: true
+        default: 'GH'
       num:
         description: '邮箱数量'
         required: true
-        default: '1'
+        default: '5'
 
 jobs:
   Server:
@@ -43,8 +47,65 @@ jobs:
       - name: 生成代码
         id: generate_Code
         run: |
-          7z x -p${{ secrets.ZIPASS }} DB/DB2 -o./
-          python 2.py ${{ github.event.inputs.num }}
+          cat > gen.py << 'EOF'
+          import requests
+          import argparse
+          import json
+          import random
+          import string
+
+          # 解析命令行参数
+          parser = argparse.ArgumentParser(description="生成临时邮箱")
+          parser.add_argument("-p", "--prefix", type=str, help="邮箱用户名前缀，不提供则随机生成", default="")
+          parser.add_argument("-c", "--count", type=int, help="生成邮箱数量，默认为5个", default=5)
+          args = parser.parse_args()
+
+          # 请求的 URL
+          url = "${{ secrets.EDU_API_URL }}"
+
+          # 设置请求头
+          headers = {
+            'Content-Type': 'application/json',
+            'X-API-Key': '${{ secrets.EDU_API_TOKEN }}' 
+          }
+
+          # 生成随机字符串函数
+          def generate_random_string(length=8):
+              return ''.join(random.choice(string.ascii_letters) for _ in range(length))
+
+          # 批量生成邮箱
+          for i in range(1, args.count + 1):
+              # 如果没有提供前缀，则生成随机8位字母
+              if not args.prefix:
+                  name = generate_random_string(8)
+              else:
+                  # 使用前缀加数字序号(从001开始)
+                  name = f"{args.prefix}{i:03d}"
+              
+              # 请求体数据
+              payload = {
+                "name": name,
+                "expiryTime": 0,
+                "domain": "${{ secrets.EDU_DOMAIN }}"
+              }
+              
+              try:
+                  # 发送 POST 请求
+                  response = requests.post(url, json=payload, headers=headers)
+                  
+                  # 检查请求是否成功
+                  response.raise_for_status()
+                  
+                  # 获取响应内容
+                  json_response = response.json()
+                  print(f"邮箱 {i}/{args.count} 生成成功: {json.dumps(json_response, indent=2, ensure_ascii=False)}")
+                  
+              except requests.exceptions.RequestException as e:
+                  print(f"生成邮箱 {name} 失败: {e}")
+
+          EOF
+
+          python gen.py -p ${{ github.event.inputs.pre }} -c ${{ github.event.inputs.num }}>> email.txt
           echo 生成成功
 
       - name: 发送通知
