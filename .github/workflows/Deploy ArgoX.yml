@@ -49,6 +49,16 @@ jobs:
           echo "postal=$(cat raw_net_info | jq -r '.postal')" >> $GITHUB_OUTPUT
           echo "timezone=$(cat raw_net_info | jq -r '.timezone')" >> $GITHUB_OUTPUT
 
+      - name: 开启BBR
+        run: |
+          sudo modprobe tcp_bbr
+          sudo echo "tcp_bbr" | sudo tee --append /etc/modules-load.d/modules.conf
+          sudo echo "net.core.default_qdisc=fq" | sudo tee --append /etc/sysctl.conf
+          sudo echo "net.ipv4.tcp_congestion_control=bbr" | sudo tee --append /etc/sysctl.conf
+          sudo sysctl -p
+          sudo sysctl net.ipv4.tcp_available_congestion_control
+          sudo sysctl net.ipv4.tcp_congestion_control
+
       - name: 安装 ArgoX
         run: |
           cat > config.conf << 'EOF'
