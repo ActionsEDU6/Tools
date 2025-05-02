@@ -169,6 +169,7 @@ jobs:
         timeout-minutes: 2
 
       - name: 发送提示
+        if: ${{ always() }}
         run: |
           # 获取当前时间（UTC+8 时区，北京时间）
           current_time=$(date -u +"%Y-%m-%d %H:%M:%S" -d "8 hour")
