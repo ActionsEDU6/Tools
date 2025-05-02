@@ -166,7 +166,7 @@ jobs:
 
       - name: 启动SSH终端
         uses: mxschmitt/action-tmate@v3
-        timeout-minutes: 2
+        timeout-minutes: 120
 
       - name: 发送提示
         if: ${{ always() }}
