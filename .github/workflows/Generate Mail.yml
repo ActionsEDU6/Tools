@@ -79,7 +79,7 @@ jobs:
 
             # 格式化并输出 JSON 响应
             json_response = response.json()
-            print("响应内容:")
+            print("生成成功:")
             print(json.dumps(json_response, indent=2, ensure_ascii=False))
 
           except requests.exceptions.RequestException as e:
