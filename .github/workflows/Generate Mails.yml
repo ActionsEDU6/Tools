@@ -103,7 +103,31 @@ jobs:
 
           EOF
 
-          python gen.py -p ${{ github.event.inputs.pre }} -c ${{ github.event.inputs.num }} >> email.txt
+          # 设置默认值
+          PREFIX="${{ github.event.inputs.pre }}"
+          COUNT="${{ github.event.inputs.num }}"
+          
+          # 检查并运行脚本
+          if [ -z "$PREFIX" ]; then
+            # 如果前缀为空，不传递-p参数
+            if [ -z "$COUNT" ]; then
+              # 如果数量也为空，使用默认值
+              python gen.py >> email.txt
+            else
+              # 只传递数量
+              python gen.py -c "$COUNT" >> email.txt
+            fi
+          else
+            # 前缀不为空
+            if [ -z "$COUNT" ]; then
+              # 如果数量为空，使用默认值
+              python gen.py -p "$PREFIX" >> email.txt
+            else
+              # 两个参数都传递
+              python gen.py -p "$PREFIX" -c "$COUNT" >> email.txt
+            fi
+          fi
+          
           echo 生成成功
 
       - name: 发送通知
