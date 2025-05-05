@@ -39,7 +39,7 @@ jobs:
       - name: 部署 Autopsy
         shell: cmd
         run: |
-          aria2c -o Autopsy.msi "https://github.com/sleuthkit/autopsy/releases/download/autopsy-4.22.0/autopsy-4.22.0-64bit.msi"
+          aria2c -o Autopsy.msi "https://github.com/sleuthkit/autopsy/releases/download/autopsy-4.22.1/autopsy-4.22.1-64bit.msi"
           echo "正在部署 Autopsy，请稍候..."
           msiexec /i Autopsy.msi INSTALLDIR="D:\Autopsy" /quiet /norestart
           echo "Autopsy 部署成功！"
