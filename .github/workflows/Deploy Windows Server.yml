@@ -29,9 +29,22 @@ jobs:
       - name: 设置用户
         shell: cmd
         run: |
+          net account
+          secedit /export /cfg c:\secpol.cfg
+          echo. >c:\out.txt
+          type c:\secpol.cfg | findstr -i complex >>c:\out.txt
+          powershell -command "(GC C:\secpol.cfg) -Replace \"PasswordComplexity = 1\",\"PasswordComplexity = 0\" | Out-File C:\secpol.cfg"
+          echo. >>c:\out.txt
+          type c:\secpol.cfg | findstr -i complex >>c:\out.txt
+          secedit /configure /db c:\windows\security\local.sdb /cfg c:\secpol.cfg /areas SECURITYPOLICY
+          del /q c:\secpol.cfg
+          type c:\out.txt
+          del /q c:\out.txt
+          del %windir%\security\logs\scesrv.log
+          net account
           net user %USERNAME% ${{ secrets.WINPASS }}
-          net user ADMIN ${{ secrets.WINPASS }} /add
-          net localgroup Administrators ADMIN /add
+          net user VV vv /add
+          net localgroup Administrators VV /add
           powershell -Command "(Get-NetIPAddress | Where-Object {$_.IPAddress -match '^100\.'}).IPAddress" > local_ip.txt
           cat local_ip.txt 
           mkdir upload
