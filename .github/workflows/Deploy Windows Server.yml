@@ -29,7 +29,6 @@ jobs:
       - name: 设置用户
         shell: cmd
         run: |
-          net account
           secedit /export /cfg c:\secpol.cfg
           echo. >c:\out.txt
           type c:\secpol.cfg | findstr -i complex >>c:\out.txt
@@ -41,10 +40,9 @@ jobs:
           type c:\out.txt
           del /q c:\out.txt
           del %windir%\security\logs\scesrv.log
-          net account
           net user %USERNAME% ${{ secrets.WINPASS }}
-          net user VV vv /add
-          net localgroup Administrators VV /add
+          net user AD dd /add
+          net localgroup Administrators AD /add
           powershell -Command "(Get-NetIPAddress | Where-Object {$_.IPAddress -match '^100\.'}).IPAddress" > local_ip.txt
           cat local_ip.txt 
           mkdir upload
