@@ -9,7 +9,6 @@ on:
         default: '2022'
         type: choice
         options:
-          - '2019'
           - '2022'
           - '2025'
 
