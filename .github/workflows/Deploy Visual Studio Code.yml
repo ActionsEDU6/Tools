@@ -55,7 +55,10 @@ jobs:
           mkdir d:\vscode
           unzip -o vscode.zip -d d:\vscode
           echo "正在创建 Visual Studio Code 快捷方式..."
-          runas /user:AD mklink "C:\Users\AD\Desktop\Visual Studio Code.lnk" "D:\vscode\Code.exe"
+          schtasks /create /tn "RunMklink" /tr "cmd /c mklink \"C:\Users\AD\Desktop\Visual Studio Code.lnk\" \"D:\vscode\Code.exe\"" ^
+              /sc once /st 00:00 /ru "DOMAIN\AD" /RL HIGHEST /f
+          schtasks /run /tn "RunMklink"
+          schtasks /delete /tn "RunMklink" /f
           echo "Visual Studio Code 部署成功！"
 
       - name: 查看IP地址
