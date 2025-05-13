@@ -45,7 +45,7 @@ jobs:
           net localgroup Administrators AD /add
           powershell -Command "(Get-NetIPAddress | Where-Object {$_.IPAddress -match '^100\.'}).IPAddress" > local_ip.txt
           cat local_ip.txt 
-          mkdir upload
+          mkdir workspace
 
       - name: 部署 Visual Studio Code
         shell: cmd
@@ -55,13 +55,7 @@ jobs:
           mkdir d:\vscode
           unzip -o vscode.zip -d d:\vscode
           echo "正在创建 Visual Studio Code 快捷方式..."
-          powershell -Command "
-          $WScriptShell = New-Object -ComObject WScript.Shell;
-          $Shortcut = $WScriptShell.CreateShortcut('C:\Users\AD\Desktop\Visual Studio Code.lnk');
-          $Shortcut.TargetPath = 'D:\vscode\Code.exe';
-          $Shortcut.WorkingDirectory = 'D:\vscode';
-          $Shortcut.Save();
-          "
+          mklink "C:\Users\AD\Desktop\Visual Studio Code.lnk" "D:\vscode\VSCode-win32-x64\Code.exe"
           echo "Visual Studio Code 部署成功！"
 
       - name: 查看IP地址
@@ -126,5 +120,5 @@ jobs:
         if: ${{ always() }}
         with:
           name: my-artifact
-          path: upload
+          path: workspace
         
